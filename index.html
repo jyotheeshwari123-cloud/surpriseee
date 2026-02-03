@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>System Alert</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Courier New", monospace;
+  overflow-x: hidden;
+}
+
+
+/* ---------- DARK PHASE ---------- */
+#darkPhase {
+  width: 90%;
+  max-width: 720px;
+  background: #111;
+  color: #e6e6e6;
+  border: 1px solid #333;
+  padding: 32px;
+  box-shadow: 0 0 30px rgba(255,0,0,0.15);
+
+  margin: auto;
+  margin-top: 20vh;
+}
+
+
+.alert {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.left { margin-top: 18px; }
+
+button {
+  background: none;
+  border: 1px solid #555;
+  color: inherit;
+  padding: 10px 18px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+#darkWrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+button:hover { background: #222; }
+
+/* ---------- LOADING DOTS ---------- */
+.dots::after {
+  content: "";
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0% { content: ""; }
+  33% { content: "."; }
+  66% { content: ".."; }
+  100% { content: "..."; }
+}
+
+/* ---------- CUTE PHASE ---------- */
+#cutePhase {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  background: #eef5f0;
+  padding: 40px 20px;
+}
+
+.cuteBox {
+  max-width: 700px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  font-family: "Segoe UI", sans-serif;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.question { font-size: 18px; margin-bottom: 10px; }
+.subtext { font-size: 14px; color: #777; margin-bottom: 10px; }
+
+textarea {
+  width: 100%;
+  height: 80px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 12px;
+  resize: none;
+}
+
+.error { color: #c94f6d; margin-top: 8px; }
+
+.cuteBox button {
+  background: #5f8f7a;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  margin-top: 20px;
+}
+
+/* ---------- CONFETTI ---------- */
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 14px;
+  opacity: 0.9;
+  background: hsl(var(--hue), 70%, 70%);
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateX(var(--drift)) translateY(110vh) rotate(720deg);
+  }
+}
+
+#choiceBox {
+  position: relative;
+  width: 320px;
+  height: 160px;
+  margin: 30px auto 0;
+}
+
+#choiceBox button {
+  position: absolute;
+  top: 50%;
+  transition: transform 0.3s ease-out;
+}
+
+#yesBtn {
+  left: 20px;
+  transform: translateY(-50%);
+}
+
+#noBtn {
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+
+
+</style>
+</head>
+
+<body>
+
+<div id="darkWrapper">
+  <div id="darkPhase"></div>
+</div>
+
+
+<div id="cutePhase">
+  <div class="cuteBox" id="box"></div>
+</div>
+
+<script>
+
+let finalResponse = "";
+
+let buttonsClickable = false;
+
+
+let buttonsEnabled = false;
+let noScale = 1;
+let chaosInterval;
+let phaseTwo = false;
+
+
+/* 🔗 PASTE YOUR GOOGLE WEB APP URL HERE */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyBHfgldtVQ9-0pPdMt5tMPdQn0P0VHY9-ssFHc5RyAsG1zPpdXjosQLcArMeNLdyDa/exec";
+
+/* ---------- UTIL ---------- */
+const dark = document.getElementById("darkPhase");
+const box = document.getElementById("box");
+
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- DARK FLOW ---------- */
+async function startSystem() {
+  dark.innerHTML = `
+    <div class="alert">⚠️ OFFICIAL SYSTEM ALERT ⚠️</div>
+  `;
+  await wait(5000);
+
+  dark.innerHTML += `<div class="left">Risk level: moderate.</div>`;
+  await wait(5000);
+
+  dark.innerHTML += `<div class="left">Initial assessment: calm. mature. composed.</div>`;
+  await wait(5000);
+
+  dark.innerHTML += `
+    <div class="left">
+      Secondary scan detected:<br>
+      • a small kid hiding inside<br>
+      • attachment to little moments<br>
+      • monkey brain activation at night
+    </div>`;
+  await wait(5000);
+
+  dark.innerHTML += `
+    <div class="left"><br>🤖 HUMAN VERIFICATION REQUIRED</div>
+    <button onclick="verify(true)">I am not a robot</button>
+    <button onclick="verify(false)">I might be a robot</button>
+  `;
+}
+
+async function verify(human) {
+  dark.innerHTML = `<div class="left">${human ? "Human verified. <br> Emotional patterns detected.... Interesting" : "Interesting… emotional capacity detected anyway."}</div>`;
+  await wait(3000);
+
+  dark.innerHTML += `
+    <div class="left">Additional verification required.</div>
+    <div class="left">The human in me wants to know more..</div>
+  `;
+  await wait(4000);
+
+  dark.innerHTML += `
+    <div class="left"><br>Before we begin… are you ready?</div>
+    <button onclick="ready()">I'm ready</button>
+  `;
+}
+
+async function ready() {
+  dark.innerHTML = `<div class="left dots">'Lesss goooooooo'</div>`;
+  await wait(3000);
+  dark.style.display = "none";
+  document.getElementById("cutePhase").style.display = "block";
+  showQuestion();
+}
+
+/* ---------- QUESTIONS ---------- */
+const questions = [
+  "If we were characters in a movie… <br>who do you think we’d be?",
+  "I loveee irritating people… <br> soo tell me, what irritates you the most? 😄",
+  "What do you like to be called?",
+  "Okieee, What was your firstttt thought about me when we started talking?",
+  "Waittt last one, last one…… was there a moment I caught your attention?"
+];
+
+let answers = [];
+let i = 0;
+
+function showQuestion() {
+  let subtitle = "";
+
+  // Question 1
+  if (i === 0) {
+    subtitle = `
+      <div class="subtext">
+        There’s no rush 😉
+      </div>
+    `;
+  }
+
+  // Question 2 → NO subtitle
+
+  // “What do you like to be called?”
+  else if (questions[i] === "What do you like to be called?") {
+    subtitle = `
+      <div class="subtext">
+        Pleaggeeee, I’d reallyyy like to know
+      </div>
+    `;
+  }
+
+  // Question 4 (index 3)
+  else if (i === 3) {
+    subtitle = `
+      <div class="subtext">
+        Just curious ✌️
+      </div>
+    `;
+  }
+
+  // All others → no subtitle
+
+  box.innerHTML = `
+    <div class="question">${questions[i]}</div>
+    ${subtitle}
+
+    <textarea id="ans"></textarea>
+    <div class="error" id="err"></div>
+    <button onclick="next()">Next</button>
+  `;
+}
+
+
+function next() {
+  const val = document.getElementById("ans").value.trim();
+  if (!val) {
+    document.getElementById("err").textContent = "This one needs an answer 🙂";
+    return;
+  }
+  answers[i++] = val;
+  i < questions.length ? showQuestion() : processAnswers();
+}
+
+/* ---------- PROCESS & FINAL ---------- */
+
+function processAnswers() {
+  // Step 1: show the first line immediately
+  box.innerHTML = `
+ <p style="
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:16px;
+">
+  Thanks for answeringggg!!! 🥰
+</p>
+  `;
+
+  // Send data in background (unchanged)
+  fetch(SHEET_URL, {
+  method: "POST",
+  body: JSON.stringify({
+    movie: answers[0],
+    irritate: answers[1],
+    called: answers[2],
+    firstThought: answers[3],
+    attention: answers[4]
+  })
+});
+
+
+  // Step 2: after a few seconds, reveal the rest
+  setTimeout(() => {
+    box.innerHTML += `
+      <p style="margin-top:28px;">
+        Oops… I almost forgot something.🙄
+      </p>
+
+      <p style="margin-top:12px;">
+        Pakka, this is the last one. Can I?
+      </p>
+
+      <button onclick="finalQuestion()">Okiee</button>
+    `;
+  }, 2500); // ⏱️ 2.5 seconds (adjust if you want slower/faster)
+}
+
+
+
+
+function chaoticMove(yes, no, slowMode) {
+  const box = document.getElementById("choiceBox");
+  const boxW = box.clientWidth;
+  const boxH = box.clientHeight;
+
+  const randX = () => Math.random() * (boxW - 140);
+  const randY = () => Math.random() * (boxH - 60);
+
+  // YES movement + playful size
+  const yesScale = Math.random() * 0.25 + 0.9;
+  yes.style.transform =
+    `translate(${randX()}px, ${randY()}px) scale(${yesScale}) translateY(-50%)`;
+
+  // NO movement + gradual shrink
+  noScale = Math.max(0.55, noScale - (slowMode ? 0.01 : 0.02));
+  const noExtra = Math.random() * 0.15;
+  no.style.transform =
+    `translate(${randX()}px, ${randY()}px) scale(${noScale + noExtra}) translateY(-50%)`;
+}
+
+
+function finalQuestion() {
+  box.innerHTML = `
+    <h2>Gajaaa,<br>will you be my Valentine? 😍</h2>
+    <p style="font-size:13px; color:#777; margin-top:6px;">
+      Choose wisely...
+    </p>
+
+    <div id="choiceBox">
+  <button id="yesBtn" onmouseover="moveButtons()" onclick="yes()">Yes</button>
+  <button id="noBtn" onmouseover="moveButtons()" onclick="no()">No</button>
+</div>
+
+  `;
+}
+
+
+
+
+function yes() {
+  if (!buttonsClickable) return;
+
+  finalResponse = "Yes";
+
+  fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      finalAnswer: "Yes"
+    })
+  });
+
+  box.innerHTML = `
+    <h2>Yaayyyy!! 💚</h2>
+    <p style="margin-top:8px;">Thank youuuuu..... 🥰</p>
+    <p style="margin-top:4px;">I knew itttt 🥳</p>
+
+    <img 
+      src="sticker.gif"
+      alt="sticker"
+      style="
+        width:160px;
+        margin-top:20px;
+        border-radius:12px;
+      "
+    />
+
+    <p style="
+      margin-top:18px;
+      font-size:27px;
+      color:#5f8f7a;
+      font-weight:800;
+    ">
+      Happy Valentine’s Day 💖✨
+    </p>
+  `;
+
+  for (let i = 0; i < 120; i++) {
+    setTimeout(() => {
+      const c = document.createElement("div");
+      c.className = "confetti";
+
+      const size = Math.random() * 6 + 6;
+      c.style.width = size + "px";
+      c.style.height = size * 1.4 + "px";
+
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.animationDuration = Math.random() * 2 + 3 + "s";
+      c.style.setProperty("--drift", (Math.random() * 200 - 100) + "px");
+      c.style.setProperty("--hue", Math.random() * 360);
+
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 6000);
+    }, i * 20);
+  }
+}
+
+
+function no() {
+  if (!buttonsClickable) return;
+
+  finalResponse = "No";
+
+  fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      finalAnswer: "No"
+    })
+  });
+
+  box.innerHTML = `
+    <h2 style="margin-bottom:6px;">It’s okay 💛</h2>
+
+    <p style="margin-top:6px;">
+      Thank you for being honest 😌
+    </p>
+
+    <img 
+      src="sad.gif"
+      alt="sad"
+      style="
+        width:160px;
+        margin-top:22px;
+        border-radius:12px;
+      "
+    />
+  `;
+}
+
+
+let moveCount = 0;
+const MAX_MOVES = 10;
+
+function moveButtons() {
+  const yes = document.getElementById("yesBtn");
+  const no = document.getElementById("noBtn");
+  const box = document.getElementById("choiceBox");
+
+  if (moveCount >= MAX_MOVES) {
+    buttonsClickable = true;
+    return;
+  }
+
+  const boxW = box.clientWidth;
+  const boxH = box.clientHeight;
+
+  const safeX = boxW / 2 - 70;  // keeps button inside
+  const safeY = boxH / 2 - 40;
+
+  const rand = (n) => (Math.random() * n * 2) - n;
+
+  yes.style.transform =
+    `translate(${rand(safeX)}px, ${rand(safeY)}px) translateY(-50%)`;
+
+  no.style.transform =
+    `translate(${rand(safeX)}px, ${rand(safeY)}px) translateY(-50%)`;
+
+  moveCount++;
+}
+
+
+
+
+
+
+
+startSystem();
+</script>
+
+</body>
+</html>
